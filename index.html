@@ -39,7 +39,7 @@
 <style>
 :root{
   --bg:#f5f1e6; --ink:#2b2f3a; --muted:#8a8f9b; --line:#a9aebb;
-  --blue:#4f63d2; --green:#3c9f4b; --arrow:#c8336b; --hl:#bcd0ea;
+  --blue:#4f63d2; --green:#3c9f4b; --colA:#4f63d2; --colB:#3c9f4b; --inkA:#4f63d2; --inkB:#2f8a3d; --arrow:#c8336b; --hl:#bcd0ea;
   --box:#3b6fd1; --ok:#2e9e5b; --bad:#e0533d; --card:#fffdf8; --gold:#f2b632;
   --c:30px;
 }
@@ -74,13 +74,13 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
 .frame.pick{cursor:pointer;animation:breathe 1.6s ease-in-out infinite}
 .frame.ten{border-color:var(--gold);box-shadow:0 0 0 calc(var(--c)*.12) #f2b63255}
 .cnt{width:calc(var(--c)*1.2);text-align:center;font-weight:800;font-size:calc(var(--c)*.85);line-height:1}
-.cnt.b{color:var(--blue)} .cnt.g{color:var(--green)}
+.cnt.b{color:var(--inkA)} .cnt.g{color:var(--inkB)}
 .frame.ten .cnt{color:#c48a00}
 .slot{width:var(--c);height:var(--c);flex:none;border-radius:calc(var(--c)*.12);position:relative}
 .slot.dash{border:2px dashed #9aa1ae}
 .cube{box-shadow:inset 0 calc(var(--c)*.14) 0 #ffffff40,inset 0 calc(var(--c)*-.08) 0 #00000026}
 .cube::after{content:"";position:absolute;inset:31%;border-radius:50%;background:#00000038;box-shadow:inset 0 2px 2px #00000040}
-.cube.blue{background:var(--blue)} .cube.green{background:var(--green)}
+.cube.A{background:var(--colA)} .cube.B{background:var(--colB)}
 .fly{position:fixed;z-index:50;margin:0;pointer-events:none}
 .frame{touch-action:none}
 .frame .cube.grab{cursor:grab}
@@ -104,7 +104,7 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
 #bar{position:absolute;background:var(--hl);border-radius:5cqw;opacity:0;transition:opacity .4s;z-index:0}
 #bar.on{opacity:1}
 .num{position:absolute;transform:translate(-50%,-50%);font-weight:800;font-size:15cqw;line-height:1;z-index:2;border-radius:3cqw;padding:0 1.5cqw}
-#nA{color:var(--blue)} #nB{color:var(--green)} #nP{color:var(--ink);font-weight:600}
+#nA{color:var(--inkA)} #nB{color:var(--inkB)} #nP{color:var(--ink);font-weight:600}
 .num.pick{cursor:pointer;animation:hop 1.3s ease-in-out infinite;background:#fff;box-shadow:0 0 0 .6cqw currentColor}
 #nB.pick{animation-delay:.65s}
 @keyframes hop{50%{transform:translate(-50%,-58%)}}
@@ -259,13 +259,33 @@ const full = i => count(i) === 10;
 function start(a, b){
   S.a = a; S.b = b; S.m = null; S.input = ''; S.wrong = 0; S.hint = false; S.step = 'choose'; S.note = ''; S.focus = 'answer'; S.solved = false;   // 처음엔 최종 답 칸에 커서
   const mk = (k, c) => Array.from({length:10}, (_, i) => i < k ? {c} : {c:null, dash:true});
-  slots = [mk(a,'blue'), mk(b,'green')];
+  slots = [mk(a,'A'), mk(b,'B')];
+  pickColors();
   $('#fx').innerHTML = ''; inkClear();
   const md = S.set.mode;
   if (md === 'front') choose(0, true);
   else if (md === 'back') choose(1, true);
   else if (md === 'alt') { choose(S.alt, true); S.alt = 1 - S.alt; }
   render();
+}
+/* 문제마다 블록·숫자 색을 두 가지 골라 쓰기 (비슷한 색끼리는 짝짓지 않음) */
+const COLORS = {
+  blue:  ['#4f63d2', '#4f63d2'], green:  ['#3c9f4b', '#2f8a3d'], orange: ['#f08a24', '#d9730f'],
+  pink:  ['#e65c9c', '#d4417f'], red:    ['#e04848', '#cf3434'], purple: ['#8a5cd6', '#7446c4'],
+  teal:  ['#1fa7a0', '#148b85'], yellow: ['#f2c230', '#c99a0a']
+};
+const CLASH = ['red-pink','red-orange','orange-yellow','blue-purple','green-teal','blue-teal','pink-purple'];
+let lastColors = '';
+function pickColors(){
+  const names = Object.keys(COLORS); let p, k;
+  do {
+    p = [names[Math.floor(Math.random() * names.length)], names[Math.floor(Math.random() * names.length)]];
+    k = p.join('-');
+  } while (p[0] === p[1] || CLASH.includes(k) || CLASH.includes(p[1] + '-' + p[0]) || k === lastColors);
+  lastColors = k;
+  const r = document.documentElement.style;
+  r.setProperty('--colA', COLORS[p[0]][0]); r.setProperty('--inkA', COLORS[p[0]][1]);
+  r.setProperty('--colB', COLORS[p[1]][0]); r.setProperty('--inkB', COLORS[p[1]][1]);
 }
 function choose(m, silent){
   if (S.step !== 'choose') return;
