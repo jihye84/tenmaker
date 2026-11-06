@@ -348,8 +348,8 @@ function renderEq(){
   bS.classList.toggle('open', !solved && writable(bS));
   bS.classList.toggle('good', solved);
   const h = $('#helper');
-  if (['answer','done'].includes(S.step)) { h.textContent = `( 10 + ${S.a + S.b - 10} )`; h.classList.add('on'); }
-  else h.classList.remove('on');
+  h.textContent = `( 10 + ${S.a + S.b - 10} )`;
+  h.classList.toggle('on', ['answer','done'].includes(S.step) || S.solved);
 }
 function renderMsg(){
   const m = $('#msg'); let t = '', cls = '';
@@ -406,7 +406,11 @@ function check(){
     if (+S.input === want) {
       S.input = ''; S.focus = 'step'; S.solved = true; S.hint = false; S.note = ''; sound(2);
       const fin = () => { S.step = 'done'; S.stars++; render(); confetti(); };
-      if (S.m !== null) { S.step = 'move'; render(); moveCubes(fin); } else fin();
+      if (S.m === null) {   // 방법을 고르지 않았으면 큰 수 쪽을 10으로 채우고, 작은 수를 가르기
+        S.m = S.a >= S.b ? 0 : 1;
+        slots[1 - S.m].forEach(s => { if (!s.c) s.dash = false; });
+      }
+      S.step = 'move'; render(); moveCubes(fin);
     } else {
       sound(0); busy = true; box.classList.add('bad');
       setTimeout(() => { box.classList.remove('bad'); S.input = ''; busy = false; render(); }, 650);
