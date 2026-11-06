@@ -141,6 +141,9 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
 .k.next.go{background:var(--ok);box-shadow:0 .5vmin 0 #1f7343;animation:pulse 1s ease-in-out infinite}
 @keyframes pulse{50%{filter:brightness(1.15)}}
 #pad.off .d{opacity:.35}
+.k.next{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.12em}
+.k.next .kb{display:none;font-size:.42em;font-weight:600;opacity:.8;border:1.5px solid currentColor;border-radius:.4em;padding:.05em .55em;line-height:1.3}
+@media (hover:hover) and (pointer:fine){.k.next .kb{display:block}}
 
 /* 세로 화면(휴대폰·세운 태블릿) */
 @media (max-aspect-ratio:1/1){
@@ -211,7 +214,7 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
     <button class="k d k4" data-k="4">4</button><button class="k d k5" data-k="5">5</button><button class="k d k6" data-k="6">6</button>
     <button class="k d k7" data-k="7">7</button><button class="k d k8" data-k="8">8</button><button class="k d k9" data-k="9">9</button>
     <button class="k d k0" data-k="0">0</button><button class="k sm d kdel" data-k="del">⌫</button><button class="k sm kre" data-k="re">↺ 다시</button>
-    <button class="k next" data-k="next">다음 문제 ▶</button>
+    <button class="k next" data-k="next"><span>다음 문제 ▶</span><small class="kb">스페이스 바</small></button>
   </div>
 </div>
 
